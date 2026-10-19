@@ -1,0 +1,18 @@
+{
+  "trusted_contacts": [
+    { "name": "Test Contact One", "phone": "+919876500001" },
+    { "name": "Test Contact Two", "phone": "+919876500002" }
+  ],
+  "profile": { "name": "Test Citizen", "district": "Madurai", "state": "Tamil Nadu", "language": "ta" },
+  "sample_reports": [
+    { "type": "Road damage", "description": "Large pothole near bus stand", "lat": 9.9252, "lon": 78.1198, "date": "2026-10-01" },
+    { "type": "Streetlight", "description": "Streetlight not working on main road", "lat": 9.9195, "lon": 78.1193, "date": "2026-10-02" }
+  ],
+  "sample_locations": [
+    { "city": "Chennai", "lat": 13.0827, "lon": 80.2707 },
+    { "city": "Madurai", "lat": 9.9252, "lon": 78.1198 },
+    { "city": "Coimbatore", "lat": 11.0168, "lon": 76.9558 }
+  ],
+  "helplines": { "emergency": "112", "women": "1091", "women_support": "181", "child": "1098", "elderline": "14567" },
+  "test_languages": ["en", "hi", "ta", "bodo"]
+}
