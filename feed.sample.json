@@ -1,0 +1,9 @@
+{
+  "items": [
+    {"id":"d-2026-10-20-01","type":"disaster","title":"Heavy rain warning","body":"Orange alert for coastal districts for the next 24 hours. Avoid travel near rivers.","url":"https://sachet.ndma.gov.in/","state":"Tamil Nadu","at":"2026-10-20T08:00:00+05:30"},
+    {"id":"b-2026-10-20-01","type":"blood","title":"B+ blood needed urgently","body":"Government hospital, 2 units, contact the blood bank.","url":"tel:112","state":"All","at":"2026-10-20T09:00:00+05:30"},
+    {"id":"s-001","type":"schemes","title":"New scheme launched","body":"Check eligibility on myScheme.","url":"https://www.myscheme.gov.in/","state":"All","at":"2026-10-20T10:00:00+05:30"},
+    {"id":"e-001","type":"exams","title":"Exam notification","body":"Application window opens this week.","url":"https://www.india.gov.in/","state":"All","at":"2026-10-20T10:30:00+05:30"},
+    {"id":"j-001","type":"jobs","title":"New government vacancies","body":"See details on the official site.","url":"https://www.india.gov.in/","state":"All","at":"2026-10-20T11:00:00+05:30"}
+  ]
+}
