@@ -66,6 +66,24 @@
 <div id="toast" role="status"></div>
 <nav id="nav"></nav>
 <script>
+    /* Voice bridge: Android WebView has no Web Speech API, so use the phone's own speech recogniser through NsVoice */
+    (function(){
+     if(window.SpeechRecognition||window.webkitSpeechRecognition||!window.NsVoice)return;
+     var cur=null;
+     function R(){this.lang='en-IN';this.continuous=false;this.interimResults=false;this.maxAlternatives=1;this.onresult=null;this.onerror=null;this.onend=null;this.onstart=null}
+     R.prototype.start=function(){if(cur&&cur!==this){var o=cur;cur=null;try{NsVoice.cancel()}catch(e){}}cur=this;try{NsVoice.start(this.lang||'en-IN',!!this.interimResults)}catch(e){cur=null;throw e}if(this.onstart)try{this.onstart()}catch(e){}};
+     R.prototype.stop=function(){if(cur===this)try{NsVoice.stop()}catch(e){}};
+     R.prototype.abort=function(){if(cur===this){var me=cur;cur=null;try{NsVoice.cancel()}catch(e){}}};
+     window.__nsv=function(type,a){var r=cur;if(!r)return;
+      if(type==='result'||type==='partial'){var alts=[];try{alts=JSON.parse(a).map(function(t){return {transcript:t,confidence:1}})}catch(e){}
+       if(!alts.length)return;alts.isFinal=(type==='result');var res=[alts];
+       if(r.onresult)try{r.onresult({resultIndex:0,results:res})}catch(e){}}
+      else if(type==='error'){if(r.onerror)try{r.onerror({error:a})}catch(e){}}
+      else if(type==='end'){cur=null;if(r.onend)try{r.onend()}catch(e){}}};
+     window.webkitSpeechRecognition=window.SpeechRecognition=R;
+    })();
+</script>
+<script>
     /* ---------- whole-page translation state ---------- */
     var GTCODES={as:1,bn:1,doi:1,gu:1,kn:1,ks:1,gom:1,mai:1,ml:1,'mni-Mtei':1,mr:1,ne:1,or:1,pa:1,sa:1,sat:1,sd:1,ta:1,te:1,ur:1};
     var GT={state:'',ready:false,loading:false,q:[],to:null,nt:null};/* state: '' | loading | ok | fail | nolang */
@@ -1158,7 +1176,7 @@
 <script>
     /* ===== Add-on 10: youth careers, farmer storage finder, Bharat voice assistant ===== */
     (function(){
-    var $=function(i){return document.getElementById(i)},E=function(s){return esc(s)},SR=window.SpeechRecognition||window.webkitSpeechRecognition,rc=null,on=false,wake=ld('bwake',true),busy=false,pt=null;
+    var $=function(i){return document.getElementById(i)},E=function(s){return esc(s)},SR=window.SpeechRecognition||window.webkitSpeechRecognition,rc=null,on=false,wake=ld('bwake',false),busy=false,pt=null;
     T.en.x10farm='Farmer';T.hi.x10farm='किसान';T.en.x10career='Career opportunities';T.hi.x10career='करियर के अवसर';
     function LK(a){return a.map(function(x){var tel=/^tel:/.test(x[1]);return '<p style="margin:6px 0"><a class="notranslate" translate="no" href="'+x[1]+'"'+(tel?'':' target="_blank" rel="noopener"')+'>'+E(x[0])+(tel?' 📞':' ↗')+'</a></p>'}).join('')}
     function D(h,b,o){return '<details class="card"'+(o?' open':'')+'><summary>'+h+'</summary>'+b+'</details>'}
@@ -1733,7 +1751,7 @@
     /* ===== Add-on 12: sign language and deaf / hard-of-hearing access ===== */
     (function(){
     var $=function(i){return document.getElementById(i)},X=function(s){return esc(s)},enc=encodeURIComponent;
-    var SG=Object.assign({cap:true,vis:false,fab:false},ld('sgn',{}));
+    var SG=Object.assign({cap:true,vis:false,fab:true},ld('sgn',{}));
     function sgSave(){sv('sgn',SG)}
     function D(h,b,o){return '<details class="card"'+(o?' open':'')+'><summary>'+h+'</summary>'+b+'</details>'}
     function LK(a){return a.map(function(x){return '<p style="margin:6px 0"><a class="notranslate" translate="no" href="'+x[1]+'" target="_blank" rel="noopener">'+X(x[0])+'</a></p>'}).join('')}
@@ -1799,7 +1817,7 @@
     window.__capSay=function(t){try{if(SG.cap)caption(t);if(SG.vis)flash()}catch(e){}};
 
     /* ---------- floating button ---------- */
-    function fab(){var f=$('x12fab');if(SG.fab&&!f){f=document.createElement('button');f.id='x12fab';f.className='btn';f.setAttribute('aria-label','Sign language and deaf access');f.textContent='🤟';f.setAttribute('data-x12','open');f.style.cssText='position:fixed;left:10px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:50;margin:0;border-radius:50%;width:56px;height:56px;font-size:24px';document.body.appendChild(f)}else if(!SG.fab&&f)f.remove()}
+    function fab(){var f=$('x12fab');if(SG.fab&&!f){f=document.createElement('button');f.id='x12fab';f.className='btn';f.setAttribute('aria-label','Sign language and deaf access');f.textContent='\ud83e\udd1f';f.setAttribute('data-x12','open');f.style.cssText='position:fixed;left:10px;bottom:calc(90px + env(safe-area-inset-bottom,0px));z-index:50;margin:0;border-radius:50%;width:56px;height:56px;font-size:24px';document.body.appendChild(f)}else if(!SG.fab&&f)f.remove()}
     fab();
     var pr=render;render=function(){pr();fab()};
 
@@ -1937,5 +1955,21 @@
      setInterval(function(){check(false)},15*60*1000);
      document.addEventListener('visibilitychange',function(){if(!document.hidden&&Date.now()-last>5*60*1000)check(false)});
     })();
+</script>
+
+<style id="nsLayoutFix">
+    /* floating buttons stack on the left: Bharat mic at the bottom, sign language directly above it */
+    #x10b{left:10px!important;bottom:calc(90px + env(safe-area-inset-bottom,0px))!important;z-index:96!important}
+    #x12fab{left:14px!important;bottom:calc(158px + env(safe-area-inset-bottom,0px))!important;z-index:96!important;width:52px!important;height:52px!important;font-size:24px!important;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+    #x9fab{z-index:96!important}
+    /* messages and panels sit above the button stack, never under it */
+    #x10r{bottom:calc(224px + env(safe-area-inset-bottom,0px))!important;max-height:35vh!important}
+    #x9ga{bottom:calc(224px + env(safe-area-inset-bottom,0px))!important}
+    #toast{bottom:auto!important;top:calc(72px + env(safe-area-inset-top,0px))!important;z-index:130!important}
+    /* page content can scroll clear of the buttons */
+    main{padding-bottom:150px!important}
+</style>
+<script>
+    (function(){function sync(){var b=document.getElementById('x10b'),f=document.getElementById('x12fab');if(b&&f)f.style.display=b.style.display==='none'?'none':''}setInterval(sync,500)})();
 </script>
 </body></html>
