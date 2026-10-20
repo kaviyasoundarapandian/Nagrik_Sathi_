@@ -84,6 +84,27 @@
     })();
 </script>
 <script>
+    /* Read-aloud bridge: use the phone's own text-to-speech engine (WebView speechSynthesis is often silent) */
+    (function(){
+     if(!window.NsTts)return;
+     function U(t){this.text=t===undefined?'':String(t);this.lang='';this.rate=1;this.pitch=1;this.volume=1;this.voice=null;this.onstart=null;this.onend=null;this.onerror=null}
+     var map={},id=0;
+     function count(){var n=0;for(var k in map)n++;return n}
+     var S={speaking:false,pending:false,paused:false,onvoiceschanged:null,
+      speak:function(u){if(!u||!String(u.text||'').trim()){return}u._id=++id;map[u._id]=u;S.speaking=true;try{NsTts.speak(u._id,String(u.text),u.lang||'en-IN',+u.rate||1,+u.pitch||1)}catch(e){delete map[u._id];if(u.onerror)try{u.onerror({error:'synthesis-failed'})}catch(x){}}},
+      cancel:function(){map={};S.speaking=false;try{NsTts.stop()}catch(e){}},
+      pause:function(){},resume:function(){},getVoices:function(){return []},
+      addEventListener:function(){},removeEventListener:function(){}};
+     window.__nst=function(type,i){var u=map[i];if(!u)return;
+      if(type==='start'){if(u.onstart)try{u.onstart({})}catch(e){}return}
+      delete map[i];S.speaking=count()>0;
+      if(type==='done'){if(u.onend)try{u.onend({})}catch(e){}}
+      else{if(u.onerror)try{u.onerror({error:'synthesis-failed'})}catch(e){}}};
+     try{Object.defineProperty(window,'speechSynthesis',{value:S,configurable:true,writable:true})}catch(e){window.speechSynthesis=S}
+     window.SpeechSynthesisUtterance=U;
+    })();
+</script>
+<script>
     /* ---------- whole-page translation state ---------- */
     var GTCODES={as:1,bn:1,doi:1,gu:1,kn:1,ks:1,gom:1,mai:1,ml:1,'mni-Mtei':1,mr:1,ne:1,or:1,pa:1,sa:1,sat:1,sd:1,ta:1,te:1,ur:1};
     var GT={state:'',ready:false,loading:false,q:[],to:null,nt:null};/* state: '' | loading | ok | fail | nolang */
